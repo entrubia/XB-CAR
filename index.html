@@ -192,7 +192,7 @@
             <!-- Start Engine Button -->
             <button id="start-engine-btn" onclick="startEngineAndEnter()" class="w-full sm:w-80 mx-auto group relative inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-bold text-black transition-all duration-300 bg-brand-lime hover:bg-brand-limeHover rounded-xl shadow-xl hover:shadow-brand-lime/50 active:scale-95 overflow-hidden">
                 <i class="fa-solid fa-power-off text-xl ml-3 text-black transition-transform group-hover:rotate-90"></i>
-                <span>تشغيل المحرك والدخول</span>
+                <span>جاهز نروح أبعد؟</span>
             </button>
             <p class="text-xs text-[#9AA3AF] mt-4"><i class="fa-solid fa-volume-high ml-1 text-brand-lime"></i> اضغط لتشغيل هدر المحرك وبدء التجربة</p>
         </div>
@@ -540,71 +540,64 @@
         }
 
         // Web Audio API Synthesizer for Deep Real V8 Exhaust Engine Sound
-        function playEngineRevSound() {
+        async function playEngineRevSound() {
             try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) return;
-                const ctx = new AudioContext();
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) return;
+                const ctx = new AudioContextClass();
+
+                // Unsuspend/Resume audio context on user interaction to comply with browser autoplay policies
+                if (ctx.state === 'suspended') {
+                    await ctx.resume();
+                }
+
                 const now = ctx.currentTime;
                 const totalDuration = 3.8;
 
-                // Master Low-Pass Filter to cut all sharp/horn frequencies
+                // Master Low-Pass Filter
                 const masterFilter = ctx.createBiquadFilter();
                 masterFilter.type = 'lowpass';
-                masterFilter.frequency.setValueAtTime(110, now);
-                masterFilter.frequency.exponentialRampToValueAtTime(160, now + 0.6);
-                masterFilter.frequency.exponentialRampToValueAtTime(550, now + 1.8); // Peak throttle rev
-                masterFilter.frequency.exponentialRampToValueAtTime(115, now + 3.5);
-                masterFilter.Q.value = 2.0;
+                masterFilter.frequency.setValueAtTime(150, now);
+                masterFilter.frequency.exponentialRampToValueAtTime(1400, now + 1.5);
+                masterFilter.frequency.exponentialRampToValueAtTime(200, now + 3.5);
+                masterFilter.Q.value = 2.5;
 
                 const masterGain = ctx.createGain();
-                masterGain.gain.setValueAtTime(0.001, now);
-                masterGain.gain.linearRampToValueAtTime(0.45, now + 0.3);
-                masterGain.gain.setValueAtTime(0.45, now + 2.4);
+                masterGain.gain.setValueAtTime(0.01, now);
+                masterGain.gain.linearRampToValueAtTime(0.75, now + 0.2);
+                masterGain.gain.setValueAtTime(0.75, now + 2.2);
                 masterGain.gain.exponentialRampToValueAtTime(0.001, now + totalDuration);
 
                 masterFilter.connect(masterGain);
                 masterGain.connect(ctx.destination);
 
-                // 1. Deep Engine Cylinder Oscillator (Low Frequency Mechanical Rumble)
+                // Sub Oscillator (Low Frequency V8 Engine Core)
                 const subOsc = ctx.createOscillator();
                 subOsc.type = 'sawtooth';
-                subOsc.frequency.setValueAtTime(32, now); // Deep V8 idle (~32 Hz)
-                subOsc.frequency.linearRampToValueAtTime(45, now + 0.6);
-                subOsc.frequency.exponentialRampToValueAtTime(135, now + 1.8); // Rev pulse
-                subOsc.frequency.exponentialRampToValueAtTime(35, now + 3.4);
+                subOsc.frequency.setValueAtTime(45, now);
+                subOsc.frequency.exponentialRampToValueAtTime(240, now + 1.5);
+                subOsc.frequency.exponentialRampToValueAtTime(50, now + 3.4);
 
-                const subGain = ctx.createGain();
-                subGain.gain.setValueAtTime(0.6, now);
-                subGain.gain.linearRampToValueAtTime(0.85, now + 1.8);
-                subGain.gain.linearRampToValueAtTime(0.3, now + 3.4);
+                // Harmonic Oscillator (Engine Chug & Rumble)
+                const harmonicOsc = ctx.createOscillator();
+                harmonicOsc.type = 'square';
+                harmonicOsc.frequency.setValueAtTime(22.5, now);
+                harmonicOsc.frequency.exponentialRampToValueAtTime(120, now + 1.5);
+                harmonicOsc.frequency.exponentialRampToValueAtTime(25, now + 3.4);
 
-                subOsc.connect(subGain);
-                subGain.connect(masterFilter);
+                const harmGain = ctx.createGain();
+                harmGain.gain.value = 0.4;
 
-                // 2. Cylinder Firing Pulse Modulator (V8 Engine Chug effect)
-                const pulseOsc = ctx.createOscillator();
-                pulseOsc.type = 'triangle';
-                pulseOsc.frequency.setValueAtTime(12, now); // Cylinder firings
-                pulseOsc.frequency.exponentialRampToValueAtTime(48, now + 1.8);
-                pulseOsc.frequency.exponentialRampToValueAtTime(14, now + 3.4);
+                harmonicOsc.connect(harmGain);
+                harmGain.connect(masterFilter);
+                subOsc.connect(masterFilter);
 
-                const pulseGain = ctx.createGain();
-                pulseGain.gain.setValueAtTime(15, now);
-
-                pulseOsc.connect(pulseGain);
-                pulseGain.connect(subOsc.frequency);
-
-                // 3. Realistic Exhaust Air Gush Noise (Brown Noise Buffer)
+                // Exhaust Air Noise Layer
                 const bufferSize = ctx.sampleRate * totalDuration;
                 const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
                 const output = noiseBuffer.getChannelData(0);
-                let lastOut = 0.0;
                 for (let i = 0; i < bufferSize; i++) {
-                    const white = Math.random() * 2 - 1;
-                    output[i] = (lastOut + (0.02 * white)) / 1.02; // Brown noise algorithm
-                    lastOut = output[i];
-                    output[i] *= 3.2;
+                    output[i] = (Math.random() * 2 - 1) * 0.4;
                 }
 
                 const noiseSource = ctx.createBufferSource();
@@ -612,35 +605,34 @@
 
                 const noiseFilter = ctx.createBiquadFilter();
                 noiseFilter.type = 'bandpass';
-                noiseFilter.frequency.setValueAtTime(80, now);
-                noiseFilter.frequency.exponentialRampToValueAtTime(340, now + 1.8);
-                noiseFilter.frequency.exponentialRampToValueAtTime(85, now + 3.4);
-                noiseFilter.Q.value = 1.0;
+                noiseFilter.frequency.setValueAtTime(200, now);
+                noiseFilter.frequency.exponentialRampToValueAtTime(900, now + 1.5);
+                noiseFilter.frequency.exponentialRampToValueAtTime(220, now + 3.4);
+                noiseFilter.Q.value = 1.5;
 
                 const noiseGain = ctx.createGain();
-                noiseGain.gain.setValueAtTime(0.12, now);
-                noiseGain.gain.linearRampToValueAtTime(0.4, now + 1.8);
+                noiseGain.gain.setValueAtTime(0.15, now);
+                noiseGain.gain.linearRampToValueAtTime(0.5, now + 1.5);
                 noiseGain.gain.exponentialRampToValueAtTime(0.01, now + totalDuration);
 
                 noiseSource.connect(noiseFilter);
                 noiseFilter.connect(noiseGain);
                 noiseGain.connect(masterGain);
 
-                // Start all sound nodes
                 subOsc.start(now);
-                pulseOsc.start(now);
+                harmonicOsc.start(now);
                 noiseSource.start(now);
 
                 subOsc.stop(now + totalDuration);
-                pulseOsc.stop(now + totalDuration);
+                harmonicOsc.stop(now + totalDuration);
                 noiseSource.stop(now + totalDuration);
             } catch (e) {
-                console.log("Audio Context sound synthesis skipped:", e);
+                console.warn("Audio Context error:", e);
             }
         }
 
         // Engine Start Button Handler & Transition logic
-        function startEngineAndEnter() {
+        async function startEngineAndEnter() {
             const tachometerBox = document.getElementById('tachometer-box');
             const introOverlay = document.getElementById('intro-overlay');
 
@@ -650,7 +642,7 @@
             }
 
             // Play deep V8 engine rev audio
-            playEngineRevSound();
+            await playEngineRevSound();
 
             // Smoothly fade out entrance screen during engine rev sound
             setTimeout(() => {
