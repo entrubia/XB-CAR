@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>XB CAR | أكس بي كار - عالم السيارات بين يديك</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            lime: '#9DFF4F',
+                            limeBright: '#9DFF4F',
+                            limeHover: '#87E63E',
+                            dark: '#0E131A',
+                            darker: '#07090D',
+                            cardBg: '#0E131A',
+                            cardBorder: '#252B33',
+                            secondaryBtn: '#181E27',
+                            emerald: '#25D366',
+                            emeraldHover: '#1EBE5D'
+                        },
+                        textMain: '#F5F7FA',
+                        textMuted: '#9AA3AF',
+                        darkBorder: '#252B33'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #07090D;
+            color: #F5F7FA;
+            overflow-x: hidden;
+            letter-spacing: -0.01em;
+        }
+
+        /* Substack & Medium inspired container layout */
+        .article-container {
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .wide-container {
+            max-width: 960px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Glassmorphism effects with vibrant Lime borders */
+        .glass-panel {
+            background: rgba(14, 19, 26, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid #252B33;
+        }
+
+        .glass-card {
+            background: #0E131A;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid #252B33;
+        }
+
+        /* Lime Glow Effect */
+        .glow-lime {
+            box-shadow: 0 0 30px rgba(157, 255, 79, 0.25);
+        }
+
+        .glow-lime-lg {
+            box-shadow: 0 0 50px rgba(157, 255, 79, 0.4);
+        }
+
+        .stack-container {
+            position: relative;
+            min-height: 420px;
+            touch-action: pan-y;
+        }
+
+        /* Clean single active card stack without bleeding overlaps */
+        .stack-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: #0E131A;
+            border: 1px solid #252B33;
+            border-radius: 1rem;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(12px) scale(0.97);
+        }
+
+        .stack-card.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+            z-index: 20;
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(157, 255, 79, 0.15);
+        }
+
+        /* Engine Rev Gauge Animation */
+        @keyframes needleRev {
+            0% { transform: rotate(-120deg); }
+            45% { transform: rotate(85deg); }
+            65% { transform: rotate(50deg); }
+            100% { transform: rotate(-120deg); }
+        }
+
+        .rev-active .gauge-needle {
+            animation: needleRev 3.6s ease-in-out forwards;
+        }
+
+        /* Screen transition overlay */
+        #intro-overlay {
+            transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.7s;
+        }
+
+        .overlay-hidden {
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+    </style>
+</head>
+<body class="bg-[#07090D] text-[#F5F7FA] min-h-screen flex flex-col justify-between selection:bg-brand-lime selection:text-black">
+
+    <!-- ENTRANCE OVERLAY (START ENGINE TRANSITION) -->
+    <div id="intro-overlay" class="fixed inset-0 z-50 bg-[#07090D] flex flex-col items-center justify-center p-4">
+        <!-- Background Ambient Glow -->
+        <div class="absolute inset-0 bg-radial gradient pointer-events-none opacity-40" style="background: radial-gradient(circle at center, rgba(157,255,79,0.15) 0%, transparent 75%);"></div>
+
+        <div class="relative z-10 text-center article-container w-full px-4">
+            <!-- Brand Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border border-[#252B33] text-brand-limeBright text-xs font-bold tracking-widest uppercase mb-8 shadow-lg">
+                <i class="fa-solid fa-sparkles text-brand-limeBright"></i> XB CAR SHINE & GUARD
+            </div>
+
+            <!-- Logo Header -->
+            <h1 class="text-4xl sm:text-5xl font-black tracking-tight text-[#F5F7FA] mb-2">
+                XB <span class="text-brand-lime">CAR</span>
+            </h1>
+            <p class="text-[#9AA3AF] text-sm mb-10 font-light">تلميع وحماية السيارات الفاخرة | جدة</p>
+
+            <!-- Tachometer Visual UI -->
+            <div id="tachometer-box" class="relative w-40 h-40 sm:w-44 sm:h-44 mx-auto mb-10 flex items-center justify-center rounded-full border-4 border-brand-lime/30 bg-[#0E131A] shadow-2xl glow-lime">
+                <!-- Gauge Dial Marks -->
+                <div class="absolute inset-2 rounded-full border border-dashed border-brand-lime/40"></div>
+                <!-- Numbers -->
+                <span class="absolute top-3 text-[10px] font-mono text-[#9AA3AF]">RPM x1000</span>
+                <span class="absolute right-4 text-xs font-mono font-bold text-[#F5F7FA]">4</span>
+                <span class="absolute top-8 right-7 text-xs font-mono font-bold text-brand-limeBright">6</span>
+                <span class="absolute top-8 left-7 text-xs font-mono font-bold text-red-500">8</span>
+                
+                <!-- Center Core -->
+                <div class="w-8 h-8 rounded-full bg-brand-lime/30 border border-brand-limeBright flex items-center justify-center z-10 shadow-lg shadow-brand-lime/50">
+                    <div class="w-3 h-3 rounded-full bg-brand-limeBright"></div>
+                </div>
+
+                <!-- Needle -->
+                <div class="gauge-needle absolute top-1/2 left-1/2 w-14 sm:w-16 h-1 bg-gradient-to-r from-brand-limeBright to-brand-lime rounded-full -translate-y-1/2 origin-left transition-transform duration-100" style="transform: rotate(-120deg);"></div>
+            </div>
+
+            <!-- Start Engine Button -->
+            <button id="start-engine-btn" onclick="startEngineAndEnter()" class="w-full sm:w-80 mx-auto group relative inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-bold text-black transition-all duration-300 bg-brand-lime hover:bg-brand-limeHover rounded-xl shadow-xl hover:shadow-brand-lime/50 active:scale-95 overflow-hidden">
+                <i class="fa-solid fa-power-off text-xl ml-3 text-black transition-transform group-hover:rotate-90"></i>
+                <span>تشغيل المحرك والدخول</span>
+            </button>
+            <p class="text-xs text-[#9AA3AF] mt-4"><i class="fa-solid fa-volume-high ml-1 text-brand-lime"></i> اضغط لتشغيل هدر المحرك وبدء التجربة</p>
+        </div>
+    </div>
+
+    <!-- HEADER NAVBAR -->
+    <header class="sticky top-0 z-40 w-full glass-panel border-b border-[#252B33]">
+        <div class="wide-container px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-lime flex items-center justify-center text-black font-black text-xl shadow-md glow-lime">
+                    XB
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-xl sm:text-2xl font-black tracking-wider text-[#F5F7FA] leading-none">XB <span class="text-brand-lime">CAR</span></span>
+                    <span class="text-[10px] text-brand-limeBright tracking-widest uppercase font-bold">العناية بالسيارات | جدة</span>
+                </div>
+            </a>
+
+            <!-- Location & Contact Quick Bar -->
+            <div class="flex items-center gap-3">
+                <span class="hidden lg:inline-flex items-center gap-1.5 text-xs text-[#F5F7FA] bg-[#0E131A] px-3.5 py-2 rounded-lg border border-[#252B33]">
+                    <i class="fa-solid fa-location-dot text-brand-limeBright"></i>
+                    <span>طريق المدينة المنورة، حي الرويس، جدة</span>
+                </span>
+                <a href="tel:0549400006" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0E131A] hover:bg-[#181E27] text-[#F5F7FA] border border-[#252B33] text-sm font-bold transition">
+                    <i class="fa-solid fa-phone text-brand-limeBright"></i>
+                    <span dir="ltr">054 940 0006</span>
+                </a>
+                <a href="https://wa.me/966549400006" target="_blank" class="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-lg bg-brand-emerald hover:bg-brand-emeraldHover text-white font-black text-xs sm:text-sm shadow-lg transition">
+                    <i class="fa-brands fa-whatsapp text-base sm:text-lg"></i>
+                    <span>احجز عبر واتساب</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN HERO & ARTICLE CONTAINER -->
+    <main class="flex-grow w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+
+        <!-- Medium/Substack Style Focused Header Block -->
+        <div class="article-container text-center mb-12">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-brand-lime/10 border border-brand-lime/40 text-brand-limeBright text-xs font-bold mb-4 shadow-inner">
+                حماية تدوم. لمعان دائم.
+            </span>
+            <h2 class="text-3xl sm:text-5xl lg:text-6xl font-black text-[#F5F7FA] leading-tight sm:leading-tight mb-4">
+                حافظ على سيارتك<br><span class="text-brand-lime">كأنها جديدة</span>
+            </h2>
+            <p class="text-[#9AA3AF] text-xs sm:text-sm font-light tracking-widest uppercase mb-4">Keep Your Car Like New</p>
+            <p class="text-[#9AA3AF] text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
+                في <strong class="text-brand-limeBright font-bold">XB CAR</strong> نقدم حلول متكاملة لحماية سيارتك والحفاظ على لمعانها بأعلى مستوى من الاحترافية.
+            </p>
+        </div>
+
+        <!-- STACK CARDS CONTAINER - SUBSTACK / MEDIUM CENTERED FOCUS -->
+        <div class="article-container my-6">
+            
+            <!-- Stack Cards Navigation Dots / Indicators -->
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div class="flex items-center gap-2">
+                    <span id="dot-0" class="w-7 h-2 rounded-full bg-brand-lime transition-all"></span>
+                    <span id="dot-1" class="w-2 h-2 rounded-full bg-[#252B33] transition-all"></span>
+                    <span id="dot-2" class="w-2 h-2 rounded-full bg-[#252B33] transition-all"></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="hidden sm:inline-block text-[11px] text-[#9AA3AF]"><i class="fa-solid fa-arrows-left-right ml-1 text-brand-lime"></i> اسحب للتقليب</span>
+                    <span id="card-step-indicator" class="text-xs font-bold text-brand-limeBright bg-brand-lime/15 px-3 py-1 rounded-full border border-brand-lime/30">
+                        خطوة 1 من 3
+                    </span>
+                </div>
+            </div>
+
+            <!-- Stack Viewport -->
+            <div id="stack-viewport" class="stack-container">
+
+                <!-- CARD 1: THE HOOK -->
+                <div id="card-0" class="stack-card active p-5 sm:p-7 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="w-10 h-10 rounded-xl bg-brand-lime/15 border border-brand-lime/30 flex items-center justify-center text-brand-limeBright text-lg">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </span>
+                            <span class="text-[11px] font-bold text-black bg-brand-lime px-3 py-1 rounded-full">
+                                متاح الآن بجدة
+                            </span>
+                        </div>
+
+                        <h3 class="text-xl sm:text-2xl font-bold text-[#F5F7FA] mb-2 leading-snug">
+                            احمِ طلاء سيارتك واستعد لمعان الوكالة
+                        </h3>
+                        <p class="text-[#9AA3AF] text-xs sm:text-sm leading-relaxed mb-5">
+                            أفضل خيارات حماية الطلاء PPF، النانو سيراميك والتلميع الساطع الاحترافي بجدة.
+                        </p>
+
+                        <!-- Key Benefits list -->
+                        <div class="space-y-2.5 mb-6">
+                            <div class="flex items-center gap-2.5 text-xs text-[#F5F7FA]">
+                                <i class="fa-solid fa-circle-check text-brand-lime text-sm shrink-0"></i>
+                                <span>أفلام حماية PPF ونانو سيراميك معتمدة</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 text-xs text-[#F5F7FA]">
+                                <i class="fa-solid fa-circle-check text-brand-lime text-sm shrink-0"></i>
+                                <span>تلميع ساطع وإزالة الخدوش وتصحيح الطلاء</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 text-xs text-[#F5F7FA]">
+                                <i class="fa-solid fa-circle-check text-brand-lime text-sm shrink-0"></i>
+                                <span>عزل حراري لحماية المقاعد والمقصورة</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="nextCard()" class="w-full py-3.5 rounded-xl bg-brand-lime hover:bg-brand-limeHover text-black font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg glow-lime active:scale-98">
+                        <span>اختر الخدمة واحجز موعدك</span>
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                </div>
+
+                <!-- CARD 2: STEPS & PROCESS -->
+                <div id="card-1" class="stack-card p-5 sm:p-7 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="w-10 h-10 rounded-xl bg-brand-lime/15 border border-brand-lime/30 flex items-center justify-center text-brand-limeBright text-lg">
+                                <i class="fa-solid fa-list-check"></i>
+                            </span>
+                            <span class="text-[11px] font-bold text-brand-limeBright bg-brand-lime/15 border border-brand-lime/30 px-3 py-1 rounded-full">
+                                آلية حجز سهلة
+                            </span>
+                        </div>
+
+                        <h3 class="text-xl sm:text-2xl font-bold text-[#F5F7FA] mb-1">
+                            خطوات الحجز والعناية بسيارتك
+                        </h3>
+                        <p class="text-[#9AA3AF] text-xs mb-5">احجز موعدك بسهولة وسرعة بدون تعقيد</p>
+
+                        <!-- Timeline steps -->
+                        <div class="space-y-3.5 mb-6">
+                            <div class="flex gap-3 items-center">
+                                <div class="w-7 h-7 rounded-full bg-brand-lime text-black font-bold flex items-center justify-center shrink-0 text-xs">
+                                    1
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-[#F5F7FA] text-xs sm:text-sm">اختر خدمة العناية والحماية</h4>
+                                    <p class="text-[11px] text-[#9AA3AF]">حدد (حماية PPF، نانو سيراميك، تلميع، عزل حراري).</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 items-center">
+                                <div class="w-7 h-7 rounded-full bg-brand-lime text-black font-bold flex items-center justify-center shrink-0 text-xs">
+                                    2
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-[#F5F7FA] text-xs sm:text-sm">إرسال التفاصيل للواتساب</h4>
+                                    <p class="text-[11px] text-[#9AA3AF]">توجيه طلبك مباشرة للفنيين لتأكيد الموعد.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 items-center">
+                                <div class="w-7 h-7 rounded-full bg-brand-lime text-black font-bold flex items-center justify-center shrink-0 text-xs">
+                                    3
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-[#F5F7FA] text-xs sm:text-sm">زيارة المركز بشرق طريق المدينة (جدة)</h4>
+                                    <p class="text-[11px] text-[#9AA3AF]">استلام سيارتك بأفضل نتيجة ولمعان تدوم طويلاً.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="prevCard()" class="w-1/3 py-3 rounded-xl bg-[#181E27] hover:bg-[#252B33] text-[#F5F7FA] font-bold text-xs sm:text-sm transition border border-[#252B33]">
+                            السابق
+                        </button>
+                        <button onclick="nextCard()" class="w-2/3 py-3 rounded-xl bg-brand-lime hover:bg-brand-limeHover text-black font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow">
+                            <span>التالي: تخصيص الطلب</span>
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD 3: ACTION & DIRECT WHATSAPP BUILDER -->
+                <div id="card-2" class="stack-card p-5 sm:p-7 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="w-10 h-10 rounded-xl bg-brand-emerald/15 border border-brand-emerald/30 flex items-center justify-center text-brand-emerald text-lg">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </span>
+                            <span class="text-[11px] font-bold text-white bg-brand-emerald px-3 py-1 rounded-full">
+                                تأكيد حجز مباشر
+                            </span>
+                        </div>
+
+                        <h3 class="text-xl sm:text-2xl font-bold text-[#F5F7FA] mb-1">
+                            تخصيص وتأكيد طلبك
+                        </h3>
+                        <p class="text-[#9AA3AF] text-xs mb-4">اختر الخدمة وأدخل تفاصيل سيارتك للحجز:</p>
+
+                        <!-- Dynamic WhatsApp Form -->
+                        <div class="space-y-3 mb-5">
+                            <div>
+                                <label class="block text-[11px] font-bold text-brand-limeBright mb-1">الخدمة المطلوبة</label>
+                                <select id="car-type" class="w-full bg-[#07090D] border border-[#252B33] rounded-lg p-2.5 text-xs text-[#F5F7FA] focus:border-brand-lime focus:outline-none">
+                                    <option value="حماية الطلاء (PPF كامل أو واجهة)">أفلام حماية الطلاء (PPF) الشفافة / المطفية</option>
+                                    <option value="طبقات النانو سيراميك">طلاء نانو سيراميك (حماية ولمعان دائم)</option>
+                                    <option value="تلميع احترافي وتصحيح طلاء">تلميع شامل وإزالة خدوش وتصحيح الطلاء</option>
+                                    <option value="عزل حراري وحماية داخلية">تظليل عزل حراري + حماية صالون السيارة</option>
+                                    <option value="باقة العناية والصيانة الشاملة">باقة العناية الشاملة للسيارة</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-brand-limeBright mb-1">فئة السيارة / الموديل</label>
+                                <input type="text" id="car-model" placeholder="مثال: كامري 2024 / تاهو / مرسيدس" class="w-full bg-[#07090D] border border-[#252B33] rounded-lg p-2.5 text-xs text-[#F5F7FA] focus:border-brand-lime focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-brand-limeBright mb-1">اسمك الكريم (اختياري)</label>
+                                <input type="text" id="client-name" placeholder="أدخل اسمك الكريم هنا" class="w-full bg-[#07090D] border border-[#252B33] rounded-lg p-2.5 text-xs text-[#F5F7FA] focus:border-brand-lime focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="prevCard()" class="w-1/4 py-3 rounded-xl bg-[#181E27] hover:bg-[#252B33] text-[#F5F7FA] font-bold text-xs sm:text-sm transition">
+                            السابق
+                        </button>
+                        <button onclick="sendWhatsAppOrder()" class="w-3/4 py-3 rounded-xl bg-brand-emerald hover:bg-brand-emeraldHover text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-lg active:scale-98">
+                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                            <span>تأكيد وحجز عبر الواتساب</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FEATURED SERVICES CATALOG - WIDE MEDIUM SECTION -->
+        <section class="wide-container mt-20 pt-16 border-t border-[#252B33]">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
+                <div>
+                    <span class="text-brand-limeBright text-xs font-extrabold tracking-widest uppercase">XB CAR SERVICES</span>
+                    <h3 class="text-2xl sm:text-4xl font-black text-[#F5F7FA] mt-1">خدماتنا الرئيسية للعناية بالسيارات</h3>
+                </div>
+                <p class="text-[#9AA3AF] text-xs sm:text-sm mt-2 md:mt-0">فرع جدة - طريق المدينة المنورة، حي الرويس</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+                <!-- Service 1: PPF & Ceramic -->
+                <div class="glass-card rounded-2xl p-6 border border-[#252B33] relative overflow-hidden flex flex-col justify-between group glow-lime hover:border-brand-lime transition duration-300">
+                    <span class="absolute top-0 left-0 bg-brand-lime text-black text-[10px] font-black px-3 py-1 rounded-br-lg">
+                        الخدمة الأكثر طلباً
+                    </span>
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-brand-lime text-black flex items-center justify-center text-xl mb-5 group-hover:scale-110 transition-transform shadow">
+                            <i class="fa-solid fa-shield-cat"></i>
+                        </div>
+                        <h4 class="text-xl font-black text-[#F5F7FA] mb-3">حماية الطلاء والنانو سيراميك</h4>
+                        <p class="text-[#9AA3AF] text-xs sm:text-sm leading-relaxed mb-6">
+                            أفلام حماية بلمعان عالي ومقاومة للخدوش والترمل، بالإضافة لطبقات النانو سيراميك لحماية طلاء سيارتك وسهولة التنظيف.
+                        </p>
+                    </div>
+                    <button onclick="sendQuickCatalogOrder('حماية الطلاء والنانو سيراميك')" class="w-full py-3 rounded-lg bg-brand-emerald hover:bg-brand-emeraldHover text-white font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span>استفسر عن الحماية</span>
+                    </button>
+                </div>
+
+                <!-- Service 2: Polishing & Paint Correction -->
+                <div class="glass-card rounded-2xl p-6 border border-[#252B33] hover:border-brand-lime/50 transition duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-brand-lime/20 text-brand-limeBright flex items-center justify-center text-xl mb-5 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <h4 class="text-xl font-black text-[#F5F7FA] mb-3">التلميع والتفصيل الاحترافي</h4>
+                        <p class="text-[#9AA3AF] text-xs sm:text-sm leading-relaxed mb-6">
+                            تلميع ساطع، إزالة الخدوش وتصحيح الطلاء، تنظيف داخلي وخارجي عميق باستعادة مظهر بريق الوكالة الأصلي.
+                        </p>
+                    </div>
+                    <button onclick="sendQuickCatalogOrder('التلميع والتفصيل')" class="w-full py-3 rounded-lg bg-[#181E27] hover:bg-brand-emerald hover:text-white text-[#F5F7FA] font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 border border-[#252B33]">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span>حجز التلميع والتفصيل</span>
+                    </button>
+                </div>
+
+                <!-- Service 3: Long-term Care & Tinting -->
+                <div class="glass-card rounded-2xl p-6 border border-[#252B33] hover:border-brand-lime/50 transition duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-brand-lime/20 text-brand-limeBright flex items-center justify-center text-xl mb-5 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-sun-plant-wilt"></i>
+                        </div>
+                        <h4 class="text-xl font-black text-[#F5F7FA] mb-3">العزل الحراري والعناية المستمرة</h4>
+                        <p class="text-[#9AA3AF] text-xs sm:text-sm leading-relaxed mb-6">
+                            تظليل عازل للحرارة يحمي مقصورة المركبة من حرارة الشمس الشديدة وبرامج صيانة حماية دورية ومخصصة.
+                        </p>
+                    </div>
+                    <button onclick="sendQuickCatalogOrder('العزل الحراري والعناية طويلة الأمد')" class="w-full py-3 rounded-lg bg-[#181E27] hover:bg-brand-emerald hover:text-white text-[#F5F7FA] font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 border border-[#252B33]">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span>استفسر عن العزل الحراري</span>
+                    </button>
+        <!-- SERVICE 3 END -->
+            </div>
+        </section>
+
+        <!-- LOCATION & DIRECT PHONE BANNER -->
+        <section class="wide-container mt-16 glass-panel rounded-2xl p-4 sm:p-6 lg:p-8 border border-[#252B33] flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 glow-lime">
+            <div class="flex items-center gap-3 sm:gap-4 w-full md:w-auto">
+                <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-brand-lime/20 border border-brand-limeBright flex items-center justify-center text-brand-limeBright text-lg sm:text-2xl shrink-0 shadow">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <div>
+                    <h4 class="text-base sm:text-xl font-black text-[#F5F7FA]">موقع مركز XB CAR Auto Care</h4>
+                    <p class="text-[#9AA3AF] text-[11px] sm:text-sm mt-0.5 sm:mt-1">
+                        <i class="fa-solid fa-map-pin text-brand-limeBright ml-1"></i>
+                        طريق المدينة المنورة، حي الرويس، جدة 23214
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
+                <a href="tel:0549400006" class="flex-1 md:flex-initial px-3 sm:px-6 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl bg-[#0E131A] hover:bg-[#181E27] text-[#F5F7FA] font-bold text-[11px] sm:text-sm text-center transition flex items-center justify-center gap-1.5 sm:gap-2 border border-[#252B33]">
+                    <i class="fa-solid fa-phone text-brand-limeBright text-xs sm:text-sm"></i>
+                    <span dir="ltr">054 940 0006</span>
+                </a>
+                <a href="https://wa.me/966549400006" target="_blank" class="flex-1 md:flex-initial px-3 sm:px-6 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl bg-brand-emerald hover:bg-brand-emeraldHover text-white font-black text-[11px] sm:text-sm text-center transition flex items-center justify-center gap-1.5 sm:gap-2 shadow-lg whitespace-nowrap">
+                    <i class="fa-brands fa-whatsapp text-sm sm:text-lg"></i>
+                    <span>تواصل واتساب مباشر</span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-16 border-t border-[#252B33] py-8 text-center text-xs text-[#9AA3AF]">
+        <div class="wide-container px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>© <span id="year">2026</span> XB CAR Auto Care — جميع الحقوق محفوظة.</p>
+            <p class="text-brand-limeBright font-bold">مركز التلميع والحماية الفاخر - جدة</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Safely set copyright year if element exists
+        const yearElem = document.getElementById('year');
+        if (yearElem) {
+            yearElem.textContent = new Date().getFullYear();
+        }
+
+        // Web Audio API Synthesizer for Deep Real V8 Exhaust Engine Sound
+        function playEngineRevSound() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                const now = ctx.currentTime;
+                const totalDuration = 3.8;
+
+                // Master Low-Pass Filter to cut all sharp/horn frequencies
+                const masterFilter = ctx.createBiquadFilter();
+                masterFilter.type = 'lowpass';
+                masterFilter.frequency.setValueAtTime(110, now);
+                masterFilter.frequency.exponentialRampToValueAtTime(160, now + 0.6);
+                masterFilter.frequency.exponentialRampToValueAtTime(550, now + 1.8); // Peak throttle rev
+                masterFilter.frequency.exponentialRampToValueAtTime(115, now + 3.5);
+                masterFilter.Q.value = 2.0;
+
+                const masterGain = ctx.createGain();
+                masterGain.gain.setValueAtTime(0.001, now);
+                masterGain.gain.linearRampToValueAtTime(0.45, now + 0.3);
+                masterGain.gain.setValueAtTime(0.45, now + 2.4);
+                masterGain.gain.exponentialRampToValueAtTime(0.001, now + totalDuration);
+
+                masterFilter.connect(masterGain);
+                masterGain.connect(ctx.destination);
+
+                // 1. Deep Engine Cylinder Oscillator (Low Frequency Mechanical Rumble)
+                const subOsc = ctx.createOscillator();
+                subOsc.type = 'sawtooth';
+                subOsc.frequency.setValueAtTime(32, now); // Deep V8 idle (~32 Hz)
+                subOsc.frequency.linearRampToValueAtTime(45, now + 0.6);
+                subOsc.frequency.exponentialRampToValueAtTime(135, now + 1.8); // Rev pulse
+                subOsc.frequency.exponentialRampToValueAtTime(35, now + 3.4);
+
+                const subGain = ctx.createGain();
+                subGain.gain.setValueAtTime(0.6, now);
+                subGain.gain.linearRampToValueAtTime(0.85, now + 1.8);
+                subGain.gain.linearRampToValueAtTime(0.3, now + 3.4);
+
+                subOsc.connect(subGain);
+                subGain.connect(masterFilter);
+
+                // 2. Cylinder Firing Pulse Modulator (V8 Engine Chug effect)
+                const pulseOsc = ctx.createOscillator();
+                pulseOsc.type = 'triangle';
+                pulseOsc.frequency.setValueAtTime(12, now); // Cylinder firings
+                pulseOsc.frequency.exponentialRampToValueAtTime(48, now + 1.8);
+                pulseOsc.frequency.exponentialRampToValueAtTime(14, now + 3.4);
+
+                const pulseGain = ctx.createGain();
+                pulseGain.gain.setValueAtTime(15, now);
+
+                pulseOsc.connect(pulseGain);
+                pulseGain.connect(subOsc.frequency);
+
+                // 3. Realistic Exhaust Air Gush Noise (Brown Noise Buffer)
+                const bufferSize = ctx.sampleRate * totalDuration;
+                const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                let lastOut = 0.0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    output[i] = (lastOut + (0.02 * white)) / 1.02; // Brown noise algorithm
+                    lastOut = output[i];
+                    output[i] *= 3.2;
+                }
+
+                const noiseSource = ctx.createBufferSource();
+                noiseSource.buffer = noiseBuffer;
+
+                const noiseFilter = ctx.createBiquadFilter();
+                noiseFilter.type = 'bandpass';
+                noiseFilter.frequency.setValueAtTime(80, now);
+                noiseFilter.frequency.exponentialRampToValueAtTime(340, now + 1.8);
+                noiseFilter.frequency.exponentialRampToValueAtTime(85, now + 3.4);
+                noiseFilter.Q.value = 1.0;
+
+                const noiseGain = ctx.createGain();
+                noiseGain.gain.setValueAtTime(0.12, now);
+                noiseGain.gain.linearRampToValueAtTime(0.4, now + 1.8);
+                noiseGain.gain.exponentialRampToValueAtTime(0.01, now + totalDuration);
+
+                noiseSource.connect(noiseFilter);
+                noiseFilter.connect(noiseGain);
+                noiseGain.connect(masterGain);
+
+                // Start all sound nodes
+                subOsc.start(now);
+                pulseOsc.start(now);
+                noiseSource.start(now);
+
+                subOsc.stop(now + totalDuration);
+                pulseOsc.stop(now + totalDuration);
+                noiseSource.stop(now + totalDuration);
+            } catch (e) {
+                console.log("Audio Context sound synthesis skipped:", e);
+            }
+        }
+
+        // Engine Start Button Handler & Transition logic
+        function startEngineAndEnter() {
+            const tachometerBox = document.getElementById('tachometer-box');
+            const introOverlay = document.getElementById('intro-overlay');
+
+            // Trigger gauge animation
+            if (tachometerBox) {
+                tachometerBox.classList.add('rev-active');
+            }
+
+            // Play deep V8 engine rev audio
+            playEngineRevSound();
+
+            // Smoothly fade out entrance screen during engine rev sound
+            setTimeout(() => {
+                if (introOverlay) {
+                    introOverlay.classList.add('overlay-hidden');
+                    setTimeout(() => {
+                        introOverlay.style.display = 'none';
+                    }, 700);
+                }
+            }, 2100);
+        }
+
+        // Stack Card State Management
+        let currentCardIndex = 0;
+        const totalCards = 3;
+
+        function updateStackCards() {
+            for (let i = 0; i < totalCards; i++) {
+                const card = document.getElementById(`card-${i}`);
+                const dot = document.getElementById(`dot-${i}`);
+                if (!card) continue;
+
+                if (i === currentCardIndex) {
+                    card.className = 'stack-card active p-5 sm:p-7 flex flex-col justify-between';
+                } else {
+                    card.className = 'stack-card p-5 sm:p-7 flex flex-col justify-between';
+                }
+
+                if (dot) {
+                    if (i === currentCardIndex) {
+                        dot.className = 'w-7 h-2 rounded-full bg-brand-lime transition-all';
+                    } else {
+                        dot.className = 'w-2 h-2 rounded-full bg-[#252B33] transition-all';
+                    }
+                }
+            }
+
+            const stepIndicator = document.getElementById('card-step-indicator');
+            if (stepIndicator) {
+                stepIndicator.textContent = `خطوة ${currentCardIndex + 1} من ${totalCards}`;
+            }
+        }
+
+        function nextCard() {
+            if (currentCardIndex < totalCards - 1) {
+                currentCardIndex++;
+                updateStackCards();
+            }
+        }
+
+        function prevCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                updateStackCards();
+            }
+        }
+
+        // Swipe touch detection for Stack Cards on mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const stackViewport = document.getElementById('stack-viewport');
+
+        if (stackViewport) {
+            stackViewport.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            stackViewport.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+        }
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            // Swipe Left (in RTL, moving finger left moves to next)
+            if (touchStartX - touchEndX > swipeThreshold) {
+                nextCard();
+            }
+            // Swipe Right
+            if (touchEndX - touchStartX > swipeThreshold) {
+                prevCard();
+            }
+        }
+
+        const PHONE_NUMBER = "966549400006";
+
+        function sendWhatsAppOrder() {
+            const serviceTypeEl = document.getElementById('car-type');
+            const carModelEl = document.getElementById('car-model');
+            const clientNameEl = document.getElementById('client-name');
+
+            const serviceType = serviceTypeEl ? serviceTypeEl.value : "حماية وتلميع";
+            const carModelInput = carModelEl ? carModelEl.value.trim() : "";
+            const clientNameInput = clientNameEl ? clientNameEl.value.trim() : "";
+
+            let clientGreeting = clientNameInput ? `السلام عليكم، أنا ${clientNameInput}` : `السلام عليكم ورحمة الله`;
+            let carInfo = carModelInput ? `%0A🏎️ **نوع السيارة:** ${encodeURIComponent(carModelInput)}` : "";
+
+            const message = `${clientGreeting}%0Aأود حجز موعد واستفسار لدى مركز **XB CAR للعناية بالسيارات (جدة)**:%0A%0A🛠️ **الخدمة المطلوبة:** ${encodeURIComponent(serviceType)}${carInfo}%0A📍 **الفرع:** طريق المدينة المنورة، حي الرويس، جدة%0A%0Aأرجو تزويدي بالأسعار والمواعيد المتاحة للحجز.`;
+
+            const whatsappUrl = `https://wa.me/${PHONE_NUMBER}?text=${message}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function sendQuickCatalogOrder(categoryName) {
+            const message = `السلام عليكم ورحمة الله%0Aأود الاستفسار عن تفاصيل وأسعار خدمة: **${encodeURIComponent(categoryName)}** المتاحة لدى مركز **XB CAR للعناية بالسيارات** بجدة.`;
+            const whatsappUrl = `https://wa.me/${PHONE_NUMBER}?text=${message}`;
+            window.open(whatsappUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
