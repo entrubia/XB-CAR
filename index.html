@@ -643,6 +643,9 @@
             const tachometerBox = document.getElementById('tachometer-box');
             const introOverlay = document.getElementById('intro-overlay');
 
+            // Scroll to top immediately to ensure header view
+            window.scrollTo({ top: 0, behavior: 'instant' });
+
             // Trigger gauge animation
             if (tachometerBox) {
                 tachometerBox.classList.add('rev-active');
@@ -657,6 +660,8 @@
                     introOverlay.classList.add('overlay-hidden');
                     setTimeout(() => {
                         introOverlay.style.display = 'none';
+                        // Ensure screen stays at top header after transition
+                        window.scrollTo(0, 0);
                     }, 700);
                 }
             }, 2100);
